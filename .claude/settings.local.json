@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "WebFetch(domain:djot.net)",
+      "WebFetch(domain:help.panic.com)",
+      "WebFetch(domain:docs.nova.app)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "mcp__plugin_github_github__search_repositories",
+      "mcp__plugin_github_github__get_file_contents"
+    ]
+  }
+}

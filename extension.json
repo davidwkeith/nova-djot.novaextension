@@ -1,0 +1,8 @@
+{
+    "identifier": "io.dwk.dojit",
+    "name": "djot",
+    "organization": "dwk",
+    "description": "Lorem ipsum, dolor sit amet.",
+    "version": "1.0",
+    "categories": ["languages"]
+}
