@@ -1,8 +1,9 @@
 {
-    "identifier": "io.dwk.dojit",
-    "name": "djot",
+    "identifier": "io.dwk.djot",
+    "name": "Djot",
     "organization": "dwk",
-    "description": "Lorem ipsum, dolor sit amet.",
-    "version": "1.0",
-    "categories": ["languages"]
+    "description": "Djot markup language support with syntax highlighting, code folding, and symbol navigation.",
+    "version": "1.0.0",
+    "categories": ["languages"],
+    "license": "MIT"
 }
