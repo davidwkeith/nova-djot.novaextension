@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<syntax name="djot">
+    <meta>
+        <name>Djot</name>
+        <type>markup</type>
+        <preferred-file-extension>dj</preferred-file-extension>
+    </meta>
+
+    <detectors>
+        <extension priority="1.0">dj</extension>
+    </detectors>
+
+    <indentation>
+        <increase>
+            <expression>^\s*([-*+]|\d+[.)]) </expression>
+        </increase>
+        <decrease>
+            <expression></expression>
+        </decrease>
+    </indentation>
+
+    <comments>
+        <multiline>
+            <starts-with>
+                <expression>\{%</expression>
+            </starts-with>
+            <ends-with>
+                <expression>%\}</expression>
+            </ends-with>
+        </multiline>
+    </comments>
+
+    <tree-sitter language="djot">
+        <highlights path="highlights.scm" />
+        <folds path="folds.scm" />
+        <symbols path="symbols.scm" />
+        <injections path="injections.scm" />
+    </tree-sitter>
+</syntax>
