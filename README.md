@@ -1,46 +1,24 @@
-<!--
-👋 Hello! As Nova users browse the extensions library, a good README can help them understand what your extension does, how it works, and what setup or configuration it may require.
+**Djot** provides syntax highlighting, code folding, and symbol navigation for the [Djot](https://djot.net/) markup language.
 
-Not every extension will need every item described below. Use your best judgement when deciding which parts to keep to provide the best experience for your new users.
+## Features
 
-💡 Quick Tip! As you edit this README template, you can preview your changes by selecting **Extensions → Activate Project as Extension**, opening the Extension Library, and selecting "djot" in the sidebar.
+- Full syntax highlighting for all Djot constructs
+- Code folding for sections, code blocks, lists, tables, and more
+- Heading navigation in the Symbols sidebar
+- Language injection in fenced code blocks, raw blocks, math (LaTeX), and frontmatter
 
-Let's get started!
--->
+## Supported Syntax
 
-<!--
-🎈 Include a brief description of the features your syntax extension provides. For example:
--->
+### Block-Level
+Headings, paragraphs, code blocks, raw blocks, block quotes, ordered lists, bullet lists, task lists, definition lists, tables, divs, thematic breaks, footnotes, frontmatter
 
-**djot** provides syntax highlighting and autocompletion for **An Important Language**.
+### Inline-Level
+Emphasis, strong, insert, delete, highlight, superscript, subscript, inline code, math, links, images, autolinks, footnote references, smart punctuation, symbols, raw inline, spans with attributes
 
-<!--
-🎈 It can also be helpful to include a screenshot or GIF showing your extension in action:
--->
+## File Extension
 
-![](https://nova.app/images/en/dark/editor.png)
+Djot files use the `.dj` extension.
 
-## Language Support
+## Grammar
 
-<!--
-🎈 Whether your extension covers the entirety of a language's syntax or a subset, it can be helpful to describe that for users:
--->
-
-djot currently supports the following features of Important Language:
-
-- Lorem
-- Ipsum
-- Dolor
-
-Support for:
-
-- Sit
-- Amet
-
-is planned for a future update.
-
-<!--
-👋 That's it! Happy developing!
-
-P.S. If you'd like, you can remove these comments before submitting your extension 😉
--->
+This extension uses the [tree-sitter-djot](https://github.com/treeman/tree-sitter-djot) grammar by treeman (MIT license).

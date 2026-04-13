@@ -1,3 +1,7 @@
-## Version 1.0
+## Version 1.0.0
 
-Initial release
+- Syntax highlighting for all Djot block and inline constructs
+- Code folding for sections, code blocks, lists, tables, divs, block quotes, footnotes
+- Heading navigation in the Symbols sidebar
+- Language injection for fenced code blocks, raw blocks/inline, math (LaTeX), and frontmatter
+- Based on tree-sitter-djot grammar v2.0.0
