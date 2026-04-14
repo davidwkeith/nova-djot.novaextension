@@ -7,7 +7,6 @@ import (
 
 	"github.com/sivukhin/godjot/djot_parser"
 	"github.com/sivukhin/godjot/djot_tokenizer"
-	"github.com/tliron/glsp"
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
 
@@ -124,8 +123,23 @@ func (d *Document) findInSourceAfter(pattern string, fromOffset int) int {
 // walkNode recursively processes a node, collecting headings, definitions, and references.
 func (d *Document) walkNode(node djot_parser.TreeNode[djot_parser.DjotNode]) {
 	switch node.Type {
+	case djot_parser.SectionNode:
+		// The section ID (auto-generated from the heading text) lives on the
+		// SectionNode, not on the child HeadingNode. We handle it here so we can
+		// pass the ID down to indexHeading.
+		sectionID := node.Attributes.Get(djot_parser.IdKey)
+		for _, child := range node.Children {
+			if child.Type == djot_parser.HeadingNode {
+				d.indexHeadingWithID(child, sectionID)
+			} else {
+				d.walkNode(child)
+			}
+		}
+		return // children already handled above
+
 	case djot_parser.HeadingNode:
-		d.indexHeading(node)
+		// HeadingNode encountered outside a SectionNode (rare); index without an ID.
+		d.indexHeadingWithID(node, "")
 
 	case djot_parser.FootnoteDefNode:
 		d.indexFootnoteDef(node)
@@ -141,10 +155,9 @@ func (d *Document) walkNode(node djot_parser.TreeNode[djot_parser.DjotNode]) {
 	}
 }
 
-func (d *Document) indexHeading(node djot_parser.TreeNode[djot_parser.DjotNode]) {
+func (d *Document) indexHeadingWithID(node djot_parser.TreeNode[djot_parser.DjotNode], id string) {
 	levelStr := node.Attributes.Get(djot_parser.HeadingLevelKey)
 	level := len(levelStr) // "#" = 1, "##" = 2, etc.
-	id := node.Attributes.Get(djot_parser.IdKey)
 	text := strings.TrimSpace(string(node.FullText()))
 
 	// Find the heading in source by searching for the level markers + text.
@@ -360,13 +373,4 @@ func (d *Document) scanReferenceRefs() {
 
 func severityPtr(s protocol.DiagnosticSeverity) *protocol.DiagnosticSeverity {
 	return &s
-}
-
-func publishDiagnostics(ctx *glsp.Context, doc *Document) error {
-	diags := append([]protocol.Diagnostic{}, doc.DuplicateDiagnostics...)
-	ctx.Notify(string(protocol.ServerTextDocumentPublishDiagnostics), protocol.PublishDiagnosticsParams{
-		URI:         doc.URI,
-		Diagnostics: diags,
-	})
-	return nil
 }
