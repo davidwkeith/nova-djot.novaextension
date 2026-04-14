@@ -20,6 +20,7 @@ func NewHandler() *protocol.Handler {
 		TextDocumentDocumentSymbol:   handleDocumentSymbol,
 		TextDocumentCompletion:        handleCompletion,
 		TextDocumentHover:             handleHover,
+		TextDocumentDefinition:        handleDefinition,
 	}
 	return handler
 }
