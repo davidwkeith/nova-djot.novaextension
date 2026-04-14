@@ -1,39 +1,82 @@
-**Djot** provides syntax highlighting, code folding, symbol navigation, and language intelligence for the [Djot](https://djot.net/) markup language.
+**Djot** adds full [Djot](https://djot.net/) markup language support to [Nova](https://nova.app), including syntax highlighting, an integrated language server, and code intelligence features.
 
-## Features
+## Getting Started
 
-### Syntax
-- Full syntax highlighting for all Djot constructs
-- Code folding for sections, code blocks, lists, tables, and more
-- Language injection in fenced code blocks, raw blocks, math (LaTeX), and frontmatter
+1. Install the extension from the Nova Extension Library
+2. Open or create a file with the `.dj` extension
+3. The language server starts automatically when a Djot file is opened
 
-### Language Server
-- **Completions** — footnote labels, reference link labels, heading IDs
-- **Diagnostics** — warns on undefined footnote/link references and duplicate definitions
-- **Document Symbols** — heading outline in the Symbols sidebar
-- **Hover** — shows footnote content, link destinations
-- **Go to Definition** — jump from reference to its definition
+## Syntax Highlighting
 
-## Supported Syntax
+All Djot constructs are highlighted using a [Tree-sitter](https://tree-sitter.github.io/tree-sitter/) grammar, providing accurate, parse-tree-based coloring:
 
-### Block-Level
-Headings, paragraphs, code blocks, raw blocks, block quotes, ordered lists, bullet lists, task lists, definition lists, tables, divs, thematic breaks, footnotes, frontmatter
+- **Block-level** — headings (H1-H6), paragraphs, fenced code blocks, raw blocks, block quotes, ordered/bullet/task/definition lists, tables, divs, thematic breaks, footnote definitions, frontmatter
+- **Inline-level** — emphasis, strong, insert, delete, highlight, superscript, subscript, inline code, math, links, images, autolinks, footnote references, smart punctuation, symbols, raw inline, spans with attributes
+- **Attributes** — classes, identifiers, key-value pairs highlighted individually
 
-### Inline-Level
-Emphasis, strong, insert, delete, highlight, superscript, subscript, inline code, math, links, images, autolinks, footnote references, smart punctuation, symbols, raw inline, spans with attributes
+## Code Folding
 
-## File Extension
+Collapse and expand document sections in the editor gutter:
 
-Djot files use the `.dj` extension.
+- Sections (heading + content through next same-or-higher-level heading)
+- Fenced code blocks and raw blocks
+- Lists (bullet, ordered, task, definition)
+- Fenced divs, block quotes, tables, footnote definitions
+
+## Language Injection
+
+Embedded languages inside Djot are highlighted with their own syntax when the corresponding Nova extension is installed:
+
+- Fenced code blocks with a language tag (e.g., ` ```python `)
+- Raw blocks with a format specifier (e.g., `::: =html`)
+- Raw inline with a format attribute (e.g., `` `<b>bold</b>`{=html} ``)
+- Math expressions (injected as LaTeX)
+- Frontmatter with a language tag (e.g., `---toml`)
+
+## Language Server
+
+A built-in language server provides code intelligence without any external dependencies:
+
+### Completions
+
+Type `[^` to get a list of footnote labels defined in the document. Type `][` after link text to complete reference link labels. Type `{#` to complete heading IDs.
+
+### Diagnostics
+
+Warnings appear in the editor for:
+
+- Undefined footnote references (e.g., `[^missing]` with no matching definition)
+- Undefined link references (e.g., `[text][nowhere]` with no matching definition)
+- Duplicate footnote or reference definitions
+
+### Document Symbols
+
+The Symbols sidebar shows a nested heading outline for the document. H2 headings nest under H1, H3 under H2, and so on.
+
+### Hover
+
+Hover over a footnote reference to see the footnote's content. Hover over a reference link to see its destination URL. Hover over an inline link to see the URL.
+
+### Go to Definition
+
+Cmd-click (or right-click > Jump to Definition) on a footnote reference to jump to its `[^label]:` definition. Works the same for reference links.
+
+## Building from Source
+
+The extension includes pre-compiled binaries, but if you need to rebuild:
+
+```sh
+# Build the Tree-sitter grammar (requires Xcode CLI tools)
+make build
+
+# Build the language server (requires Go 1.23+)
+make lsp
+
+# Build both
+make all
+```
 
 ## Credits
 
-- Syntax highlighting: [tree-sitter-djot](https://github.com/treeman/tree-sitter-djot) by treeman (MIT)
-- Language server parser: [godjot](https://github.com/sivukhin/godjot) by sivukhin (MIT)
-
-## Future
-
-- Live preview
-- JavaScript scripts or commands
-- Extension settings or configuration
-- Djot-to-HTML export?
+- Syntax: [tree-sitter-djot](https://github.com/treeman/tree-sitter-djot) by treeman (MIT)
+- Parser: [godjot](https://github.com/sivukhin/godjot) by sivukhin (MIT)
