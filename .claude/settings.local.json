@@ -7,7 +7,16 @@
       "WebFetch(domain:docs.nova.app)",
       "WebFetch(domain:raw.githubusercontent.com)",
       "mcp__plugin_github_github__search_repositories",
-      "mcp__plugin_github_github__get_file_contents"
+      "mcp__plugin_github_github__get_file_contents",
+      "Bash(make build:*)",
+      "Bash(mkdir -p /Users/dwk/Developer/github.com/nova-djot.novaextension/djot-lsp/server)",
+      "Bash(go mod:*)",
+      "Bash(go get:*)",
+      "Bash(go build:*)",
+      "Bash(go test:*)",
+      "Skill(commit-commands:commit)",
+      "Bash(go run:*)",
+      "Bash(make lsp:*)"
     ]
   }
 }

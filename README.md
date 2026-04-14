@@ -31,3 +31,9 @@ Djot files use the `.dj` extension.
 - Syntax highlighting: [tree-sitter-djot](https://github.com/treeman/tree-sitter-djot) by treeman (MIT)
 - Language server parser: [godjot](https://github.com/sivukhin/godjot) by sivukhin (MIT)
 
+## Future
+
+- Live preview
+- JavaScript scripts or commands
+- Extension settings or configuration
+- Djot-to-HTML export?
