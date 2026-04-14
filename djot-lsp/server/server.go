@@ -14,9 +14,10 @@ func NewHandler() *protocol.Handler {
 		Initialize:            handleInitialize,
 		Initialized:           handleInitialized,
 		Shutdown:              handleShutdown,
-		TextDocumentDidOpen:   handleDidOpen,
-		TextDocumentDidChange: handleDidChange,
-		TextDocumentDidClose:  handleDidClose,
+		TextDocumentDidOpen:          handleDidOpen,
+		TextDocumentDidChange:        handleDidChange,
+		TextDocumentDidClose:         handleDidClose,
+		TextDocumentDocumentSymbol:   handleDocumentSymbol,
 	}
 	return handler
 }
