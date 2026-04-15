@@ -5,6 +5,25 @@ console.log("djot: main.js loaded");
 
 exports.activate = function() {
     console.log("djot: activate() called");
+
+    // Log current preview state for debugging
+    console.log("djot: workspace.path = " + nova.workspace.path);
+    console.log("djot: workspace.previewURL = " + (nova.workspace.previewURL || "null"));
+    console.log("djot: workspace.previewRootPath = " + (nova.workspace.previewRootPath || "null"));
+
+    // Log all config keys we can find related to preview
+    var keysToCheck = [
+        "preview.url", "previewURL", "preview.server",
+        "nova.preview.url", "nova.preview.server",
+        "nova.workspace.preview.url"
+    ];
+    keysToCheck.forEach(function(key) {
+        var val = nova.workspace.config.get(key);
+        if (val) {
+            console.log("djot: config[" + key + "] = " + val);
+        }
+    });
+
     var serverPath = nova.path.join(nova.extension.path, "bin", "djot-lsp");
 
     var serverOptions = {
@@ -27,31 +46,38 @@ exports.activate = function() {
         previewPort = params.port;
         console.log("djot: preview server ready on port " + previewPort);
 
-        // Try to set Nova's preview URL to our server
-        try {
-            nova.workspace.config.set("preview.url", "http://localhost:" + previewPort);
-            console.log("djot: set preview.url");
-        } catch (e) {
-            console.error("djot: failed to set preview.url: " + e);
-        }
+        // Try various config keys to set Nova's preview URL
+        var url = "http://localhost:" + previewPort;
+        var keys = [
+            "preview.url", "previewURL", "preview.server",
+            "nova.preview.url", "nova.preview.server"
+        ];
+        keys.forEach(function(key) {
+            try {
+                nova.workspace.config.set(key, url);
+                console.log("djot: set config[" + key + "] = " + url);
+            } catch (e) {
+                console.error("djot: failed config[" + key + "]: " + e);
+            }
+        });
+
+        // Log preview URL after setting
+        console.log("djot: workspace.previewURL after set = " + (nova.workspace.previewURL || "null"));
     });
 
     langClient.start();
 
-    // Register our own preview command as fallback
+    // Register preview command (opens in browser as fallback)
     nova.commands.register("io.dwk.djot.preview", function(editor) {
         if (!previewPort) {
-            console.warn("djot: preview port not set, LSP notification may not have arrived");
             nova.workspace.showWarningMessage(
                 "Preview server not ready. Make sure a .dj file is open."
             );
             return;
         }
 
-        // Open in system browser
         var url = "http://localhost:" + previewPort + "/";
         if (editor && editor.document && editor.document.path) {
-            // Build the path relative to workspace root
             var docPath = editor.document.path;
             var workRoot = nova.workspace.path;
             if (workRoot && docPath.startsWith(workRoot)) {
@@ -66,11 +92,6 @@ exports.activate = function() {
 };
 
 exports.deactivate = function() {
-    // Clean up preview URL
-    try {
-        nova.workspace.config.remove("preview.url");
-    } catch (e) {}
-
     if (langClient) {
         langClient.stop();
         langClient = null;
