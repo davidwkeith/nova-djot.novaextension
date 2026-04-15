@@ -170,9 +170,11 @@ func (ps *PreviewServer) handleRequest(w http.ResponseWriter, r *http.Request) {
 func (ps *PreviewServer) serveDjotPreview(w http.ResponseWriter, filePath string) {
 	content, err := os.ReadFile(filePath)
 	if err != nil {
+		fmt.Fprintf(os.Stderr, "djot-preview: ReadFile error: %v\n", err)
 		http.Error(w, "File not found", 404)
 		return
 	}
+	fmt.Fprintf(os.Stderr, "djot-preview: read %d bytes from %s\n", len(content), filePath)
 
 	ast := djot_parser.BuildDjotAst(content)
 	var body string
