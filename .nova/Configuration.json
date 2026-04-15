@@ -1,3 +1,4 @@
 {
-  "workspace.preview_root" : ".djot-preview\/"
+  "workspace.preview_type" : "custom",
+  "workspace.preview_url" : "http:\/\/localhost:60137\/"
 }

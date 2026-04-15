@@ -2,6 +2,8 @@ package server
 
 import (
 	"fmt"
+	"net"
+	"net/http"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -10,9 +12,6 @@ import (
 	"github.com/sivukhin/godjot/djot_parser"
 	"github.com/sivukhin/godjot/html_writer"
 )
-
-// previewDir is set to {workspaceRoot}/.djot-preview during initialization.
-var previewDir string
 
 // ---------------------------------------------------------------------------
 // HTML rendering
@@ -34,46 +33,6 @@ func renderHTMLWithLineNumbers(doc *Document) string {
 	return injectDataLines(html, doc)
 }
 
-// WritePreviewFile renders the document to HTML and writes it to
-// /tmp/djot-preview/{relative-path}.html, mirroring the project structure.
-// Returns the output file path.
-// InitPreviewDir sets up the preview directory based on the workspace root.
-func InitPreviewDir(workspaceRoot string) {
-	if workspaceRoot != "" {
-		previewDir = filepath.Join(workspaceRoot, ".djot-preview")
-	}
-}
-
-func WritePreviewFile(doc *Document, workspaceRoot string) string {
-	if previewDir == "" {
-		return ""
-	}
-
-	body := renderHTMLWithLineNumbers(doc)
-	page := previewDocument(body)
-
-	// Convert URI to file path
-	docPath := strings.TrimPrefix(doc.URI, "file://")
-
-	// Compute relative path from workspace root
-	var relPath string
-	if workspaceRoot != "" && strings.HasPrefix(docPath, workspaceRoot) {
-		relPath = strings.TrimPrefix(docPath, workspaceRoot)
-	} else {
-		relPath = "/" + filepath.Base(docPath)
-	}
-
-	// Keep the .dj extension so Nova's preview server finds it at the same path
-	outPath := filepath.Join(previewDir, relPath)
-
-	// Ensure parent directory exists
-	os.MkdirAll(filepath.Dir(outPath), 0755)
-
-	os.WriteFile(outPath, []byte(page), 0644)
-	return outPath
-}
-
-// previewDocument wraps an HTML body fragment in a full HTML page with styles.
 func previewDocument(body string) string {
 	return fmt.Sprintf(`<!DOCTYPE html>
 <html lang="en">
@@ -144,6 +103,90 @@ sub  { vertical-align: sub;    font-size: 0.75em; }
 }
 
 // ---------------------------------------------------------------------------
+// Preview HTTP server — renders .dj files as HTML on the fly
+// ---------------------------------------------------------------------------
+
+type PreviewServer struct {
+	port    int
+	server  *http.Server
+	rootDir string
+}
+
+var preview *PreviewServer
+
+// StartPreviewServer starts an HTTP server that renders .dj files as HTML.
+func StartPreviewServer(rootDir string) (int, error) {
+	if preview != nil {
+		return preview.port, nil
+	}
+
+	// Use a fixed port so the user can configure Nova's preview URL once.
+	// Port 8043 is unlikely to conflict with common services.
+	const fixedPort = 8043
+	listener, err := net.Listen("tcp", fmt.Sprintf("127.0.0.1:%d", fixedPort))
+	if err != nil {
+		// If fixed port is taken, fall back to random
+		listener, err = net.Listen("tcp", "127.0.0.1:0")
+		if err != nil {
+			return 0, err
+		}
+	}
+	port := listener.Addr().(*net.TCPAddr).Port
+
+	ps := &PreviewServer{
+		port:    port,
+		rootDir: rootDir,
+	}
+
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", ps.handleRequest)
+	ps.server = &http.Server{Handler: mux}
+	preview = ps
+
+	go ps.server.Serve(listener)
+	return port, nil
+}
+
+func StopPreviewServer() {
+	if preview != nil {
+		preview.server.Close()
+		preview = nil
+	}
+}
+
+func (ps *PreviewServer) handleRequest(w http.ResponseWriter, r *http.Request) {
+	filePath := filepath.Join(ps.rootDir, r.URL.Path)
+
+	if strings.HasSuffix(r.URL.Path, ".dj") {
+		ps.serveDjotPreview(w, filePath)
+		return
+	}
+
+	// Serve other files (CSS, images, etc.) as-is
+	http.ServeFile(w, r, filePath)
+}
+
+func (ps *PreviewServer) serveDjotPreview(w http.ResponseWriter, filePath string) {
+	content, err := os.ReadFile(filePath)
+	if err != nil {
+		http.Error(w, "File not found", 404)
+		return
+	}
+
+	ast := djot_parser.BuildDjotAst(content)
+	var body string
+	if len(ast) == 0 {
+		body = "<p><em>Empty document</em></p>"
+	} else {
+		ctx := djot_parser.NewConversionContext("html", djot_parser.DefaultConversionRegistry)
+		body = ctx.ConvertDjotToHtml(&html_writer.HtmlWriter{}, ast...)
+	}
+
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	fmt.Fprint(w, previewDocument(body))
+}
+
+// ---------------------------------------------------------------------------
 // data-line injection
 // ---------------------------------------------------------------------------
 
@@ -154,17 +197,14 @@ func injectDataLines(html string, doc *Document) string {
 	if len(locs) == 0 {
 		return html
 	}
-
 	sourceSearchStart := 0
 	var sb strings.Builder
 	prev := 0
 	for _, loc := range locs {
 		start, end := loc[0], loc[1]
 		sb.WriteString(html[prev:start])
-
 		match := html[start:end]
 		sample := extractTextSample(html, end, 30)
-
 		replacement := match
 		if sample != "" {
 			idx := strings.Index(doc.Source[sourceSearchStart:], sample)
@@ -173,21 +213,16 @@ func injectDataLines(html string, doc *Document) string {
 			} else {
 				idx += sourceSearchStart
 			}
-
 			if idx >= 0 {
 				sourceSearchStart = idx
 				pos := doc.OffsetToPosition(idx)
 				lineNum := int(pos.Line) + 1
-
 				submatches := blockTagRe.FindStringSubmatch(match)
 				if submatches != nil {
-					tagName := submatches[1]
-					existingAttrs := submatches[2]
-					replacement = fmt.Sprintf("<%s%s data-line=\"%d\">", tagName, existingAttrs, lineNum)
+					replacement = fmt.Sprintf("<%s%s data-line=\"%d\">", submatches[1], submatches[2], lineNum)
 				}
 			}
 		}
-
 		sb.WriteString(replacement)
 		prev = end
 	}

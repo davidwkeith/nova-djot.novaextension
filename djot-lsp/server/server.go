@@ -8,11 +8,11 @@ import (
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
 
-var documents sync.Map // uri string → *Document
+var documents sync.Map
 var workspaceRoot string
 
 func NewHandler() *protocol.Handler {
-	handler := &protocol.Handler{
+	return &protocol.Handler{
 		Initialize:                 handleInitialize,
 		Initialized:               handleInitialized,
 		Shutdown:                   handleShutdown,
@@ -24,7 +24,6 @@ func NewHandler() *protocol.Handler {
 		TextDocumentHover:          handleHover,
 		TextDocumentDefinition:     handleDefinition,
 	}
-	return handler
 }
 
 func handleInitialize(ctx *glsp.Context, params *protocol.InitializeParams) (any, error) {
@@ -52,11 +51,21 @@ func handleInitialize(ctx *glsp.Context, params *protocol.InitializeParams) (any
 }
 
 func handleInitialized(ctx *glsp.Context, params *protocol.InitializedParams) error {
-	InitPreviewDir(workspaceRoot)
+	if workspaceRoot == "" {
+		return nil
+	}
+	port, err := StartPreviewServer(workspaceRoot)
+	if err != nil {
+		return nil
+	}
+	ctx.Notify("djot/previewServer", map[string]interface{}{
+		"port": port,
+	})
 	return nil
 }
 
 func handleShutdown(ctx *glsp.Context) error {
+	StopPreviewServer()
 	return nil
 }
 
@@ -64,13 +73,6 @@ func handleDidOpen(ctx *glsp.Context, params *protocol.DidOpenTextDocumentParams
 	doc := NewDocument(params.TextDocument.URI, params.TextDocument.Text)
 	documents.Store(params.TextDocument.URI, doc)
 	publishDiagnostics(ctx, doc)
-
-	outPath := WritePreviewFile(doc, workspaceRoot)
-	if outPath != "" {
-		ctx.Notify("djot/previewFile", map[string]interface{}{
-			"path": outPath,
-		})
-	}
 	return nil
 }
 
@@ -86,7 +88,6 @@ func handleDidChange(ctx *glsp.Context, params *protocol.DidChangeTextDocumentPa
 	doc := NewDocument(params.TextDocument.URI, whole.Text)
 	documents.Store(params.TextDocument.URI, doc)
 	publishDiagnostics(ctx, doc)
-	WritePreviewFile(doc, workspaceRoot)
 	return nil
 }
 

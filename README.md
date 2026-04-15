@@ -11,10 +11,12 @@
 To use Nova's built-in preview button (the eye icon) with Djot files:
 
 1. Go to **Project > Project Settings**
-2. Under **Preview**, set **Local Root** to `.djot-preview`
-3. Click the eye icon on any `.dj` file — you'll see rendered HTML
+2. Under **Preview**, select **Use a custom server URL**
+3. Enter `http://localhost:8043/`
+4. Make sure **Append relative paths for previewable documents** is checked
+5. Click the eye icon on any `.dj` file — you'll see rendered HTML
 
-The extension automatically renders your Djot files to HTML in a `.djot-preview/` directory that mirrors your project structure. Add `.djot-preview/` to your project's `.gitignore`.
+The extension runs a local preview server on port 8043 that renders Djot to styled HTML on the fly.
 
 ## Syntax Highlighting
 
