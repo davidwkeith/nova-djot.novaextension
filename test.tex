@@ -1,0 +1,156 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage[most]{tcolorbox}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue,
+  urlcolor=blue,
+}
+
+\lstset{
+  language=Python,
+  basicstyle=\ttfamily\small,
+  backgroundcolor=\color{gray!10},
+  frame=single,
+  rulecolor=\color{gray!30},
+  breaklines=true,
+  showstringspaces=false,
+}
+
+\newtcolorbox{notebox}{
+  colback=blue!5,
+  colframe=blue!40,
+  fonttitle=\bfseries,
+  title=Note,
+  boxrule=0.5pt,
+  arc=2pt,
+}
+
+\title{Think Different}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{The Campaign That Defined Apple}
+
+In 1997, Apple was weeks from bankruptcy. Steve Jobs had just returned, and the company needed to remind the world --- and itself --- what it stood for.
+
+The \emph{Think Different} campaign, created with TBWA\textbackslash{}Chiat\textbackslash{}Day, became one of the most iconic advertising campaigns in history. It didn't feature a single Apple product.
+
+\section{The Misfits and Rebels}
+
+The campaign celebrated people who changed the world by thinking differently:
+
+\begin{itemize}
+  \item \textbf{Albert Einstein} --- rewrote the laws of physics
+  \item \textbf{Mahatma Gandhi} --- led a nation through nonviolence
+  \item \textbf{Martha Graham} --- revolutionized modern dance
+  \item \textbf{Pablo Picasso} --- shattered every rule of art
+  \item \textbf{Amelia Earhart} --- flew where no one had flown
+  \item \textbf{Muhammad Ali} --- floated and stung and never backed down
+  \item \textbf{Jim Henson} --- gave felt and foam a soul
+  \item \textbf{Maria Callas} --- made opera feel dangerous
+  \item \textbf{John Lennon \& Yoko Ono} --- imagined peace into a movement
+\end{itemize}
+
+\begin{quote}
+The ones who see things differently. They're not fond of rules.
+And they have no respect for the status quo.
+\end{quote}
+
+\section{The Posters}
+
+The print campaign was striking in its simplicity:
+
+\begin{center}
+\begin{tabular}{ll}
+  \toprule
+  \textbf{Element} & \textbf{Description} \\
+  \midrule
+  Photo  & Black-and-white portrait \\
+  Logo   & Rainbow Apple logo \\
+  Text   & Just two words: \emph{Think Different} \\
+  Layout & Clean, minimal, iconic \\
+  \bottomrule
+\end{tabular}
+\end{center}
+
+Each poster was a full-page black-and-white photograph with the Apple logo and the words \emph{Think Different} in the corner. Nothing else. No product shots, no specs, no pricing.
+
+\subsection{The Genius of Restraint}
+
+\begin{notebox}
+The campaign succeeded \emph{because} of what it left out. In an era of feature-laden tech ads, Apple showed faces instead of products, aspirations instead of specifications.
+\end{notebox}
+
+\section{Timeline}
+
+\begin{enumerate}
+  \item \textbf{1997} --- Jobs returns to Apple\footnote{Jobs had been ousted from Apple in 1985 and spent 12 years building NeXT and Pixar before returning.}
+  \item \textbf{1997} --- Campaign launches with TV spot and print
+  \item \textbf{1998} --- iMac launches, riding the wave of renewed brand identity
+  \item \textbf{2002} --- Campaign winds down as Apple shifts to product-focused marketing
+\end{enumerate}
+
+\section{The Legacy}
+
+The campaign did more than sell computers. It \emph{repositioned Apple's entire brand identity} --- from a struggling tech company to a cultural force.
+
+\subsection{Impact on Design}
+
+Apple's design philosophy --- \texttt{simplicity over complexity} --- traces directly back to \emph{Think Different}. The campaign's aesthetic DNA lives on in:
+
+\begin{itemize}
+  \item The clean lines of every Apple Store
+  \item The white space of every keynote slide
+  \item The minimalism of every product launch
+\end{itemize}
+
+\subsection{The Cultural Moment}
+
+\begin{notebox}
+Think Different wasn't just advertising. It was a \emph{manifesto}. It told creative people everywhere that a computer company understood them --- and that technology could be a tool for changing the world, not just a beige box on a desk.
+\end{notebox}
+
+\section{Technical Notes}
+
+This file demonstrates Djot markup features:
+
+\begin{lstlisting}
+# Djot supports fenced code blocks with language tags
+def think_different():
+    """The ones who are crazy enough to think they can change the world
+    are the ones who do."""
+    return "Here's to the crazy ones."
+\end{lstlisting}
+
+Inline code: \texttt{Think Different} was trademarked in 1997.
+
+Math example: Apple's stock price growth from 1997 to 2002 was approximately $\frac{25 - 3.19}{3.19} \approx 684\%$.
+
+A link to \href{https://apple.com}{Apple's history} and a reference link to \href{https://en.wikipedia.org/wiki/Think_different}{the Wikipedia article}.
+
+\subsection{Footnotes in Action}
+
+The campaign's voiceover was originally recorded by Richard Dreyfuss\footnote{Dreyfuss was chosen for his warm, authoritative tone --- he could make a manifesto sound like a bedtime story.}, though Jobs also recorded a version himself that was never aired publicly.
+
+\bigskip
+\noindent\rule{\textwidth}{0.4pt}
+
+\medskip
+\noindent\emph{Think Different} --- two words that changed everything.
+
+\end{document}

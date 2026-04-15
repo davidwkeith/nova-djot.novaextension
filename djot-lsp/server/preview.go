@@ -2,16 +2,16 @@ package server
 
 import (
 	"fmt"
-	"net"
-	"net/http"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
-	"sync"
 
 	"github.com/sivukhin/godjot/djot_parser"
 	"github.com/sivukhin/godjot/html_writer"
 )
+
+const previewDir = "/tmp/djot-preview"
 
 // ---------------------------------------------------------------------------
 // HTML rendering
@@ -31,6 +31,38 @@ func renderHTMLWithLineNumbers(doc *Document) string {
 		return ""
 	}
 	return injectDataLines(html, doc)
+}
+
+// WritePreviewFile renders the document to HTML and writes it to
+// /tmp/djot-preview/{relative-path}.html, mirroring the project structure.
+// Returns the output file path.
+func WritePreviewFile(doc *Document, workspaceRoot string) string {
+	body := renderHTMLWithLineNumbers(doc)
+	page := previewDocument(body)
+
+	// Convert URI to file path
+	docPath := strings.TrimPrefix(doc.URI, "file://")
+
+	// Compute relative path from workspace root
+	var relPath string
+	if workspaceRoot != "" && strings.HasPrefix(docPath, workspaceRoot) {
+		relPath = strings.TrimPrefix(docPath, workspaceRoot)
+	} else {
+		relPath = "/" + filepath.Base(docPath)
+	}
+
+	// Change .dj extension to .html
+	if strings.HasSuffix(relPath, ".dj") {
+		relPath = relPath[:len(relPath)-3] + ".html"
+	}
+
+	outPath := filepath.Join(previewDir, relPath)
+
+	// Ensure parent directory exists
+	os.MkdirAll(filepath.Dir(outPath), 0755)
+
+	os.WriteFile(outPath, []byte(page), 0644)
+	return outPath
 }
 
 // previewDocument wraps an HTML body fragment in a full HTML page with styles.
@@ -104,97 +136,7 @@ sub  { vertical-align: sub;    font-size: 0.75em; }
 }
 
 // ---------------------------------------------------------------------------
-// Preview HTTP server
-// ---------------------------------------------------------------------------
-
-// PreviewServer serves rendered Djot files as HTML.
-type PreviewServer struct {
-	mu      sync.RWMutex
-	port    int
-	server  *http.Server
-	rootDir string // workspace root path
-}
-
-var preview *PreviewServer
-
-// StartPreviewServer starts an HTTP server that renders .dj files as HTML.
-// rootDir is the workspace root — requests map to files under this directory.
-func StartPreviewServer(rootDir string) (int, error) {
-	if preview != nil {
-		return preview.port, nil
-	}
-
-	listener, err := net.Listen("tcp", "127.0.0.1:0")
-	if err != nil {
-		return 0, err
-	}
-	port := listener.Addr().(*net.TCPAddr).Port
-
-	ps := &PreviewServer{
-		port:    port,
-		rootDir: rootDir,
-	}
-
-	mux := http.NewServeMux()
-	mux.HandleFunc("/", ps.handleRequest)
-
-	ps.server = &http.Server{Handler: mux}
-	preview = ps
-
-	go ps.server.Serve(listener)
-
-	return port, nil
-}
-
-// StopPreviewServer shuts down the preview server.
-func StopPreviewServer() {
-	if preview != nil {
-		preview.server.Close()
-		preview = nil
-	}
-}
-
-// handleRequest serves .dj files as rendered HTML, and all other files as-is.
-func (ps *PreviewServer) handleRequest(w http.ResponseWriter, r *http.Request) {
-	path := r.URL.Path
-
-	// Resolve the file path relative to the workspace root
-	filePath := ps.rootDir + path
-
-	// If the request is for a .dj file, render it as HTML
-	if strings.HasSuffix(path, ".dj") {
-		ps.serveDjotPreview(w, filePath)
-		return
-	}
-
-	// For all other files (CSS, images, etc.), serve them directly
-	http.ServeFile(w, r, filePath)
-}
-
-func (ps *PreviewServer) serveDjotPreview(w http.ResponseWriter, filePath string) {
-	content, err := os.ReadFile(filePath)
-	if err != nil {
-		http.Error(w, "File not found", 404)
-		return
-	}
-
-	// Parse and render
-	ast := djot_parser.BuildDjotAst(content)
-	if len(ast) == 0 {
-		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		fmt.Fprint(w, previewDocument("<p><em>Empty document</em></p>"))
-		return
-	}
-
-	ctx := djot_parser.NewConversionContext("html", djot_parser.DefaultConversionRegistry)
-	body := ctx.ConvertDjotToHtml(&html_writer.HtmlWriter{}, ast...)
-
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	fmt.Fprint(w, previewDocument(body))
-}
-
-// ---------------------------------------------------------------------------
-// data-line injection (kept for future scroll sync)
+// data-line injection
 // ---------------------------------------------------------------------------
 
 var blockTagRe = regexp.MustCompile(`(?i)<(p|h[1-6]|pre|blockquote|ul|ol|li|table|div|hr|dl|dt|dd)(\s[^>]*|)>`)
@@ -268,25 +210,4 @@ func extractTextSample(html string, pos int, maxLen int) string {
 	}
 done:
 	return strings.TrimSpace(buf.String())
-}
-
-// WritePreviewFile and CleanupPreviewFile kept for compatibility but no longer primary.
-var previewFilePath string
-
-func WritePreviewFile(doc *Document) (string, error) {
-	body := renderHTMLWithLineNumbers(doc)
-	if previewFilePath == "" {
-		previewFilePath = "/tmp/djot-preview.html"
-	}
-	if err := os.WriteFile(previewFilePath, []byte(previewDocument(body)), 0644); err != nil {
-		return "", err
-	}
-	return previewFilePath, nil
-}
-
-func CleanupPreviewFile() {
-	if previewFilePath != "" {
-		os.Remove(previewFilePath)
-		previewFilePath = ""
-	}
 }

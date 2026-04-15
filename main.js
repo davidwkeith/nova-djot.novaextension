@@ -1,5 +1,5 @@
 var langClient = null;
-var previewPort = null;
+var lastPreviewPath = null;
 
 exports.activate = function() {
     var serverPath = nova.path.join(nova.extension.path, "bin", "djot-lsp");
@@ -20,29 +20,20 @@ exports.activate = function() {
         clientOptions
     );
 
-    langClient.onNotification("djot/previewServer", function(params) {
-        previewPort = params.port;
+    langClient.onNotification("djot/previewFile", function(params) {
+        lastPreviewPath = params.path;
     });
 
     langClient.start();
 
-    nova.commands.register("io.dwk.djot.preview", function(editor) {
-        if (!previewPort) {
+    nova.commands.register("io.dwk.djot.preview", function() {
+        if (!lastPreviewPath) {
             nova.workspace.showWarningMessage(
-                "Preview server not ready. Make sure a .dj file is open."
+                "Preview not ready. Open a .dj file first."
             );
             return;
         }
-
-        var url = "http://localhost:" + previewPort;
-        if (editor && editor.document && editor.document.path) {
-            var docPath = editor.document.path;
-            var workRoot = nova.workspace.path;
-            if (workRoot && docPath.startsWith(workRoot)) {
-                url += docPath.substring(workRoot.length);
-            }
-        }
-        nova.openURL(url);
+        nova.openURL("file://" + lastPreviewPath);
     });
 };
 
@@ -51,5 +42,5 @@ exports.deactivate = function() {
         langClient.stop();
         langClient = null;
     }
-    previewPort = null;
+    lastPreviewPath = null;
 };

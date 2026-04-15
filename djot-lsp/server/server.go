@@ -9,6 +9,7 @@ import (
 )
 
 var documents sync.Map // uri string → *Document
+var workspaceRoot string
 
 func NewHandler() *protocol.Handler {
 	handler := &protocol.Handler{
@@ -26,11 +27,7 @@ func NewHandler() *protocol.Handler {
 	return handler
 }
 
-// workspaceRoot is extracted from initialize params and used by the preview server.
-var workspaceRoot string
-
 func handleInitialize(ctx *glsp.Context, params *protocol.InitializeParams) (any, error) {
-	// Extract workspace root for preview server
 	if params.RootURI != nil {
 		workspaceRoot = strings.TrimPrefix(string(*params.RootURI), "file://")
 	} else if params.RootPath != nil {
@@ -55,24 +52,10 @@ func handleInitialize(ctx *glsp.Context, params *protocol.InitializeParams) (any
 }
 
 func handleInitialized(ctx *glsp.Context, params *protocol.InitializedParams) error {
-	if workspaceRoot == "" {
-		return nil
-	}
-
-	port, err := StartPreviewServer(workspaceRoot)
-	if err != nil {
-		return nil // Non-fatal
-	}
-
-	// Tell the client the preview server port
-	ctx.Notify("djot/previewServer", map[string]interface{}{
-		"port": port,
-	})
 	return nil
 }
 
 func handleShutdown(ctx *glsp.Context) error {
-	StopPreviewServer()
 	return nil
 }
 
@@ -80,6 +63,13 @@ func handleDidOpen(ctx *glsp.Context, params *protocol.DidOpenTextDocumentParams
 	doc := NewDocument(params.TextDocument.URI, params.TextDocument.Text)
 	documents.Store(params.TextDocument.URI, doc)
 	publishDiagnostics(ctx, doc)
+
+	outPath := WritePreviewFile(doc, workspaceRoot)
+	if outPath != "" {
+		ctx.Notify("djot/previewFile", map[string]interface{}{
+			"path": outPath,
+		})
+	}
 	return nil
 }
 
@@ -95,6 +85,7 @@ func handleDidChange(ctx *glsp.Context, params *protocol.DidChangeTextDocumentPa
 	doc := NewDocument(params.TextDocument.URI, whole.Text)
 	documents.Store(params.TextDocument.URI, doc)
 	publishDiagnostics(ctx, doc)
+	WritePreviewFile(doc, workspaceRoot)
 	return nil
 }
 
