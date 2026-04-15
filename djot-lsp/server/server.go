@@ -1,6 +1,7 @@
 package server
 
 import (
+	"encoding/json"
 	"sync"
 
 	"github.com/tliron/glsp"
@@ -9,20 +10,43 @@ import (
 
 var documents sync.Map // uri string → *Document
 
-func NewHandler() *protocol.Handler {
-	handler := &protocol.Handler{
-		Initialize:            handleInitialize,
-		Initialized:           handleInitialized,
-		Shutdown:              handleShutdown,
+// DjotHandler wraps protocol.Handler and adds support for custom
+// djot/scrollTo notifications that the base handler does not know about.
+type DjotHandler struct {
+	base *protocol.Handler
+}
+
+// Handle intercepts djot/scrollTo; all other methods are delegated to the
+// underlying protocol.Handler.
+func (h *DjotHandler) Handle(ctx *glsp.Context) (r any, validMethod bool, validParams bool, err error) {
+	if ctx.Method == "djot/scrollTo" {
+		validMethod = true
+		var params struct {
+			Line int `json:"line"`
+		}
+		if err = json.Unmarshal(ctx.Params, &params); err == nil {
+			validParams = true
+			BroadcastScroll(params.Line)
+		}
+		return nil, validMethod, validParams, err
+	}
+	return h.base.Handle(ctx)
+}
+
+func NewHandler() *DjotHandler {
+	base := &protocol.Handler{
+		Initialize:                   handleInitialize,
+		Initialized:                  handleInitialized,
+		Shutdown:                     handleShutdown,
 		TextDocumentDidOpen:          handleDidOpen,
 		TextDocumentDidChange:        handleDidChange,
 		TextDocumentDidClose:         handleDidClose,
 		TextDocumentDocumentSymbol:   handleDocumentSymbol,
-		TextDocumentCompletion:        handleCompletion,
-		TextDocumentHover:             handleHover,
-		TextDocumentDefinition:        handleDefinition,
+		TextDocumentCompletion:       handleCompletion,
+		TextDocumentHover:            handleHover,
+		TextDocumentDefinition:       handleDefinition,
 	}
-	return handler
+	return &DjotHandler{base: base}
 }
 
 func handleInitialize(ctx *glsp.Context, params *protocol.InitializeParams) (any, error) {
