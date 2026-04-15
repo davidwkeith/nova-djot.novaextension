@@ -1,7 +1,5 @@
 var langClient = null;
-var previewPort = null;
-var scrollTimer = null;
-var editorDisposable = null;
+var previewFilePath = null;
 
 exports.activate = function() {
     var serverPath = nova.path.join(nova.extension.path, "bin", "djot-lsp");
@@ -22,76 +20,25 @@ exports.activate = function() {
         clientOptions
     );
 
-    langClient.onNotification("djot/previewReady", function(params) {
-        previewPort = params.port;
-        console.log("djot-lsp: preview server ready on port " + previewPort);
+    langClient.onNotification("djot/previewFile", function(params) {
+        previewFilePath = params.path;
     });
 
     langClient.start();
 
     nova.commands.register("io.dwk.djot.preview", function(editor) {
-        console.log("djot-lsp: preview command invoked, port=" + previewPort);
-        if (!previewPort) {
-            nova.workspace.showWarningMessage("Preview server not ready yet. Try again in a moment.");
+        if (!previewFilePath) {
+            nova.workspace.showWarningMessage("Preview not ready yet. Try again in a moment.");
             return;
         }
-        var url = "http://localhost:" + previewPort + "/preview";
-        console.log("djot-lsp: opening " + url);
-        nova.openURL(url);
-        startScrollSync(editor);
+        nova.workspace.openFile(previewFilePath, { preview: true });
     });
 };
 
 exports.deactivate = function() {
-    stopScrollSync();
     if (langClient) {
         langClient.stop();
         langClient = null;
     }
-    previewPort = null;
+    previewFilePath = null;
 };
-
-function startScrollSync(initialEditor) {
-    stopScrollSync();
-
-    // Hook the current editor immediately if it is a djot file
-    if (initialEditor && initialEditor.document && initialEditor.document.syntax === "djot") {
-        hookEditor(initialEditor);
-    }
-
-    // Also hook any future active editors
-    editorDisposable = nova.workspace.onDidChangeActiveTextEditor(function(editor) {
-        if (!editor) return;
-        if (editor.document.syntax !== "djot") return;
-        hookEditor(editor);
-    });
-}
-
-function hookEditor(editor) {
-    editor.onDidChangeSelection(function() {
-        if (!previewPort || !langClient) return;
-
-        // Debounce: wait 100ms after the last cursor move
-        if (scrollTimer) clearTimeout(scrollTimer);
-        scrollTimer = setTimeout(function() {
-            var cursorPos = editor.selectedRange.start;
-            var fullText = editor.document.getTextInRange(new Range(0, cursorPos));
-            var lineNum = 0;
-            for (var i = 0; i < fullText.length; i++) {
-                if (fullText.charCodeAt(i) === 10) lineNum++;
-            }
-            langClient.sendNotification("djot/scrollTo", { line: lineNum });
-        }, 100);
-    });
-}
-
-function stopScrollSync() {
-    if (editorDisposable) {
-        editorDisposable.dispose();
-        editorDisposable = null;
-    }
-    if (scrollTimer) {
-        clearTimeout(scrollTimer);
-        scrollTimer = null;
-    }
-}
