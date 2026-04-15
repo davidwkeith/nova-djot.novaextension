@@ -31,7 +31,7 @@ exports.activate = function() {
             nova.workspace.showWarningMessage("Preview not ready yet. Try again in a moment.");
             return;
         }
-        nova.workspace.openFile(previewFilePath, { preview: true });
+        nova.openURL("file://" + previewFilePath);
     });
 };
 

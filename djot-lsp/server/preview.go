@@ -141,6 +141,22 @@ sub  { vertical-align: sub;    font-size: 0.75em; }
 </head>
 <body>
 %s
+<script>
+(function() {
+  // Save scroll position before reload, restore after
+  var key = 'djot-preview-scroll';
+  var saved = sessionStorage.getItem(key);
+  if (saved) {
+    window.scrollTo(0, parseInt(saved, 10));
+    sessionStorage.removeItem(key);
+  }
+  // Auto-reload every second, preserving scroll
+  setTimeout(function() {
+    sessionStorage.setItem(key, String(window.scrollY));
+    location.reload();
+  }, 1000);
+})();
+</script>
 </body>
 </html>`, body)
 }
