@@ -6,6 +6,16 @@
 2. Open or create a file with the `.dj` extension
 3. The language server starts automatically when a Djot file is opened
 
+### Setting Up Live Preview
+
+To use Nova's built-in preview button (the eye icon) with Djot files:
+
+1. Go to **Project > Project Settings**
+2. Under **Preview**, set **Local Root** to `.djot-preview`
+3. Click the eye icon on any `.dj` file — you'll see rendered HTML
+
+The extension automatically renders your Djot files to HTML in a `.djot-preview/` directory that mirrors your project structure. Add `.djot-preview/` to your project's `.gitignore`.
+
 ## Syntax Highlighting
 
 All Djot constructs are highlighted using a [Tree-sitter](https://tree-sitter.github.io/tree-sitter/) grammar, providing accurate, parse-tree-based coloring:
@@ -63,11 +73,13 @@ Cmd-click (or right-click > Jump to Definition) on a footnote reference to jump 
 
 ## Live Preview
 
-Run **Editor > Preview Djot** (or find it in the command palette) to open a live HTML preview of the current document.
+The extension renders Djot files to styled HTML in a `.djot-preview/` directory inside your project. The preview updates every time you edit a `.dj` file.
 
-The preview updates in real-time as you type. Scroll sync keeps the preview aligned with your cursor position in the editor — move to a heading in the source and the preview scrolls to match.
+**Using Nova's preview pane:** Click the eye icon in the toolbar. Requires the one-time Local Root setup described in Getting Started above.
 
-The preview runs on a local HTTP server (random port on localhost) and connects via WebSocket for instant updates. No external services or network access required. Supports both light and dark mode.
+**Using your browser:** Run **Extensions > Preview Djot** to open the rendered file in your default browser.
+
+The preview includes styling for headings, code blocks, tables, block quotes, and more. Supports both light and dark mode via `prefers-color-scheme`.
 
 ## Building from Source
 
@@ -82,13 +94,6 @@ make lsp
 
 # Build both
 make all
-
-## TODO
-
-- [ ] Live preview
-- [ ] JavaScript scripts or commands
-- [ ] Extension settings or configuration
-- [ ] Djot-to-HTML export
 ```
 
 ## Credits

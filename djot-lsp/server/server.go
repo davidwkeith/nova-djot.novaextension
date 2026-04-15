@@ -52,6 +52,7 @@ func handleInitialize(ctx *glsp.Context, params *protocol.InitializeParams) (any
 }
 
 func handleInitialized(ctx *glsp.Context, params *protocol.InitializedParams) error {
+	InitPreviewDir(workspaceRoot)
 	return nil
 }
 

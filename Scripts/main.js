@@ -36,7 +36,7 @@ exports.activate = function() {
             if (workRoot && docPath.startsWith(workRoot)) {
                 relPath = docPath.substring(workRoot.length);
             }
-            var previewPath = "/tmp/djot-preview" + relPath;
+            var previewPath = workRoot + "/.djot-preview" + relPath;
             nova.openURL("file://" + previewPath);
         } else if (lastPreviewPath) {
             nova.openURL("file://" + lastPreviewPath);

@@ -11,7 +11,8 @@ import (
 	"github.com/sivukhin/godjot/html_writer"
 )
 
-const previewDir = "/tmp/djot-preview"
+// previewDir is set to {workspaceRoot}/.djot-preview during initialization.
+var previewDir string
 
 // ---------------------------------------------------------------------------
 // HTML rendering
@@ -36,7 +37,18 @@ func renderHTMLWithLineNumbers(doc *Document) string {
 // WritePreviewFile renders the document to HTML and writes it to
 // /tmp/djot-preview/{relative-path}.html, mirroring the project structure.
 // Returns the output file path.
+// InitPreviewDir sets up the preview directory based on the workspace root.
+func InitPreviewDir(workspaceRoot string) {
+	if workspaceRoot != "" {
+		previewDir = filepath.Join(workspaceRoot, ".djot-preview")
+	}
+}
+
 func WritePreviewFile(doc *Document, workspaceRoot string) string {
+	if previewDir == "" {
+		return ""
+	}
+
 	body := renderHTMLWithLineNumbers(doc)
 	page := previewDocument(body)
 
@@ -52,8 +64,6 @@ func WritePreviewFile(doc *Document, workspaceRoot string) string {
 	}
 
 	// Keep the .dj extension so Nova's preview server finds it at the same path
-	// The content is HTML, which browsers render regardless of extension
-
 	outPath := filepath.Join(previewDir, relPath)
 
 	// Ensure parent directory exists
