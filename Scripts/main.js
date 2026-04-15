@@ -24,16 +24,20 @@ exports.activate = function() {
 
     langClient.onNotification("djot/previewReady", function(params) {
         previewPort = params.port;
+        console.log("djot-lsp: preview server ready on port " + previewPort);
     });
 
     langClient.start();
 
     nova.commands.register("io.dwk.djot.preview", function(editor) {
+        console.log("djot-lsp: preview command invoked, port=" + previewPort);
         if (!previewPort) {
             nova.workspace.showWarningMessage("Preview server not ready yet. Try again in a moment.");
             return;
         }
-        nova.openURL("http://localhost:" + previewPort + "/preview");
+        var url = "http://localhost:" + previewPort + "/preview";
+        console.log("djot-lsp: opening " + url);
+        nova.openURL(url);
         startScrollSync(editor);
     });
 };
