@@ -2,7 +2,7 @@
     "identifier": "io.dwk.djot",
     "name": "Djot",
     "organization": "dwk",
-    "description": "Djot markup language support with syntax highlighting, code folding, symbol navigation, and language server.",
+    "description": "Djot markup language support with syntax highlighting, code folding, symbol navigation, language server, and live preview.",
     "version": "1.0.0",
     "categories": ["languages"],
     "license": "MIT",
@@ -12,5 +12,14 @@
     ],
     "entitlements": {
         "process": true
+    },
+    "commands": {
+        "editor": [
+            {
+                "title": "Preview Djot",
+                "command": "io.dwk.djot.preview",
+                "when": "editorSyntax == 'djot'"
+            }
+        ]
     }
 }
