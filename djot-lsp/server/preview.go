@@ -3,7 +3,6 @@ package server
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 	"regexp"
 	"strings"
 
@@ -42,7 +41,7 @@ func WritePreviewFile(doc *Document) (string, error) {
 	page := previewDocument(body)
 
 	if previewFilePath == "" {
-		previewFilePath = filepath.Join(os.TempDir(), "djot-preview.html")
+		previewFilePath = "/tmp/djot-preview.html"
 	}
 
 	if err := os.WriteFile(previewFilePath, []byte(page), 0644); err != nil {

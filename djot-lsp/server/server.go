@@ -48,7 +48,7 @@ func handleInitialized(ctx *glsp.Context, params *protocol.InitializedParams) er
 }
 
 func handleShutdown(ctx *glsp.Context) error {
-	CleanupPreviewFile()
+	// Don't clean up preview file — let it persist so the browser tab stays valid
 	return nil
 }
 
