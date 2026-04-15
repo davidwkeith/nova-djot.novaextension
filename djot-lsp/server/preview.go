@@ -156,6 +156,7 @@ func StopPreviewServer() {
 
 func (ps *PreviewServer) handleRequest(w http.ResponseWriter, r *http.Request) {
 	filePath := filepath.Join(ps.rootDir, r.URL.Path)
+	fmt.Fprintf(os.Stderr, "djot-preview: request %s -> %s (root: %s)\n", r.URL.Path, filePath, ps.rootDir)
 
 	if strings.HasSuffix(r.URL.Path, ".dj") {
 		ps.serveDjotPreview(w, filePath)

@@ -25,7 +25,8 @@
       "Bash(echo \"exit code: $?\")",
       "Read(//var/folders/2j/mt8vdc5x3zlggz4s99r_23lw0000gn/T/**)",
       "Bash(grep:*)",
-      "Bash(curl -s http://localhost:59421/test.dj)"
+      "Bash(curl -s http://localhost:59421/test.dj)",
+      "Bash(curl:*)"
     ]
   }
 }
