@@ -1,6 +1,7 @@
 package server
 
 import (
+	"strings"
 	"sync"
 
 	"github.com/tliron/glsp"
@@ -25,7 +26,17 @@ func NewHandler() *protocol.Handler {
 	return handler
 }
 
+// workspaceRoot is extracted from initialize params and used by the preview server.
+var workspaceRoot string
+
 func handleInitialize(ctx *glsp.Context, params *protocol.InitializeParams) (any, error) {
+	// Extract workspace root for preview server
+	if params.RootURI != nil {
+		workspaceRoot = strings.TrimPrefix(string(*params.RootURI), "file://")
+	} else if params.RootPath != nil {
+		workspaceRoot = *params.RootPath
+	}
+
 	syncKind := protocol.TextDocumentSyncKindFull
 	return protocol.InitializeResult{
 		Capabilities: protocol.ServerCapabilities{
@@ -44,11 +55,24 @@ func handleInitialize(ctx *glsp.Context, params *protocol.InitializeParams) (any
 }
 
 func handleInitialized(ctx *glsp.Context, params *protocol.InitializedParams) error {
+	if workspaceRoot == "" {
+		return nil
+	}
+
+	port, err := StartPreviewServer(workspaceRoot)
+	if err != nil {
+		return nil // Non-fatal
+	}
+
+	// Tell the client the preview server port
+	ctx.Notify("djot/previewServer", map[string]interface{}{
+		"port": port,
+	})
 	return nil
 }
 
 func handleShutdown(ctx *glsp.Context) error {
-	// Don't clean up preview file — let it persist so the browser tab stays valid
+	StopPreviewServer()
 	return nil
 }
 
@@ -56,7 +80,6 @@ func handleDidOpen(ctx *glsp.Context, params *protocol.DidOpenTextDocumentParams
 	doc := NewDocument(params.TextDocument.URI, params.TextDocument.Text)
 	documents.Store(params.TextDocument.URI, doc)
 	publishDiagnostics(ctx, doc)
-	notifyPreview(ctx, doc)
 	return nil
 }
 
@@ -72,7 +95,6 @@ func handleDidChange(ctx *glsp.Context, params *protocol.DidChangeTextDocumentPa
 	doc := NewDocument(params.TextDocument.URI, whole.Text)
 	documents.Store(params.TextDocument.URI, doc)
 	publishDiagnostics(ctx, doc)
-	notifyPreview(ctx, doc)
 	return nil
 }
 
@@ -83,17 +105,6 @@ func handleDidClose(ctx *glsp.Context, params *protocol.DidCloseTextDocumentPara
 		Diagnostics: []protocol.Diagnostic{},
 	})
 	return nil
-}
-
-// notifyPreview writes the rendered preview file and notifies the client of its path.
-func notifyPreview(ctx *glsp.Context, doc *Document) {
-	path, err := WritePreviewFile(doc)
-	if err != nil {
-		return
-	}
-	ctx.Notify("djot/previewFile", map[string]interface{}{
-		"path": path,
-	})
 }
 
 func getDocument(uri string) *Document {
