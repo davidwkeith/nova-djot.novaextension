@@ -33,7 +33,7 @@ exports.activate = function() {
             nova.workspace.showWarningMessage("Preview server not ready yet. Try again in a moment.");
             return;
         }
-        nova.workspace.openURL("http://localhost:" + previewPort + "/preview");
+        nova.openURL("http://localhost:" + previewPort + "/preview");
         startScrollSync(editor);
     });
 };
