@@ -27,13 +27,24 @@ exports.activate = function() {
     langClient.start();
 
     nova.commands.register("io.dwk.djot.preview", function() {
-        if (!lastPreviewPath) {
+        // Open the active .dj file's rendered preview in the browser
+        var editor = nova.workspace.activeTextEditor;
+        if (editor && editor.document && editor.document.path) {
+            var docPath = editor.document.path;
+            var workRoot = nova.workspace.path;
+            var relPath = docPath;
+            if (workRoot && docPath.startsWith(workRoot)) {
+                relPath = docPath.substring(workRoot.length);
+            }
+            var previewPath = "/tmp/djot-preview" + relPath;
+            nova.openURL("file://" + previewPath);
+        } else if (lastPreviewPath) {
+            nova.openURL("file://" + lastPreviewPath);
+        } else {
             nova.workspace.showWarningMessage(
                 "Preview not ready. Open a .dj file first."
             );
-            return;
         }
-        nova.openURL("file://" + lastPreviewPath);
     });
 };
 

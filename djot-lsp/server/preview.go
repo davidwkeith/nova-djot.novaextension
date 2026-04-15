@@ -51,10 +51,8 @@ func WritePreviewFile(doc *Document, workspaceRoot string) string {
 		relPath = "/" + filepath.Base(docPath)
 	}
 
-	// Change .dj extension to .html
-	if strings.HasSuffix(relPath, ".dj") {
-		relPath = relPath[:len(relPath)-3] + ".html"
-	}
+	// Keep the .dj extension so Nova's preview server finds it at the same path
+	// The content is HTML, which browsers render regardless of extension
 
 	outPath := filepath.Join(previewDir, relPath)
 
