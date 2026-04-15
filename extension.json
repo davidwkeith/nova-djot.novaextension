@@ -6,7 +6,7 @@
     "version": "1.0.0",
     "categories": ["languages"],
     "license": "MIT",
-    "main": "Scripts/main.js",
+    "main": "main.js",
     "activationEvents": [
         "*"
     ],
