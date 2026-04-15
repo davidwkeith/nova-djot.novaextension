@@ -1,0 +1,99 @@
+# Think Different
+
+## The Campaign That Defined Apple
+
+In 1997, Apple was weeks from bankruptcy. Steve Jobs had just returned, and the company needed to remind the world — and itself — what it stood for.
+
+The _Think Different_ campaign, created with TBWA\Chiat\Day, became one of the most iconic advertising campaigns in history. It didn't feature a single Apple product.
+
+## The Misfits and Rebels
+
+The campaign celebrated people who changed the world by thinking differently:
+
+- **Albert Einstein** — rewrote the laws of physics
+- **Mahatma Gandhi** — led a nation through nonviolence
+- **Martha Graham** — revolutionized modern dance
+- **Pablo Picasso** — shattered every rule of art
+- **Amelia Earhart** — flew where no one had flown
+- **Muhammad Ali** — floated and stung and never backed down
+- **Jim Henson** — gave felt and foam a soul
+- **Maria Callas** — made opera feel dangerous
+- **John Lennon & Yoko Ono** — imagined peace into a movement
+
+> The ones who see things differently. They're not fond of rules.
+> And they have no respect for the status quo.
+
+## The Posters
+
+The print campaign was striking in its simplicity:
+
+| Element | Description |
+|---------|-------------|
+| Photo | Black-and-white portrait |
+| Logo | Rainbow Apple logo |
+| Text | Just two words: *Think Different* |
+| Layout | Clean, minimal, iconic |
+
+Each poster was a full-page black-and-white photograph with the Apple logo and the words _Think Different_ in the corner. Nothing else. No product shots, no specs, no pricing.
+
+### The Genius of Restraint
+
+{.note}
+The campaign succeeded _because_ of what it left out. In an era of feature-laden tech ads, Apple showed faces instead of products, aspirations instead of specifications.
+
+## Timeline
+
+1. **1997** — Jobs returns to Apple[^return]
+2. **1997** — Campaign launches with TV spot and print
+3. **1998** — iMac launches, riding the wave of renewed brand identity
+4. **2002** — Campaign winds down as Apple shifts to product-focused marketing
+
+[^return]: Jobs had been ousted from Apple in 1985 and spent 12 years building NeXT and Pixar before returning.
+
+## The Legacy
+
+The campaign did more than sell computers. It *repositioned Apple's entire brand identity* — from a struggling tech company to a cultural force.
+
+### Impact on Design
+
+Apple's design philosophy — `simplicity over complexity` — traces directly back to _Think Different_. The campaign's aesthetic DNA lives on in:
+
+- The clean lines of every Apple Store
+- The white space of every keynote slide
+- The minimalism of every product launch
+
+### The Cultural Moment
+
+::: note
+Think Different wasn't just advertising. It was a *manifesto*. It told creative people everywhere that a computer company understood them — and that technology could be a tool for changing the world, not just a beige box on a desk.
+:::
+
+## Technical Notes
+
+This file demonstrates Djot markup features:
+
+```python
+# Djot supports fenced code blocks with language tags
+def think_different():
+    """The ones who are crazy enough to think they can change the world
+    are the ones who do."""
+    return "Here's to the crazy ones."
+```
+
+Inline code: `Think Different` was trademarked in 1997.
+
+Math example: Apple's stock price growth from 1997 to 2002 was approximately $\frac{25 - 3.19}{3.19} \approx 684\%$.
+
+A link to [Apple's history](https://apple.com) and a reference link to [the Wikipedia article][wiki].
+
+[wiki]: https://en.wikipedia.org/wiki/Think_different
+
+### Footnotes in Action
+
+The campaign's voiceover was originally recorded by Richard Dreyfuss[^dreyfuss], though Jobs also recorded a version himself that was never aired publicly.
+
+[^dreyfuss]: Dreyfuss was chosen for his warm, authoritative tone — he could make a manifesto sound like a bedtime story.
+
+---
+
+*Think Different* — two words that changed everything.
