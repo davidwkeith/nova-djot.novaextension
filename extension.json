@@ -8,8 +8,7 @@
     "license": "MIT",
     "main": "main.js",
     "activationEvents": [
-        "onLanguage:djot",
-        "onCommand:io.dwk.djot.preview"
+        "*"
     ],
     "entitlements": {
         "process": true
