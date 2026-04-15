@@ -1,6 +1,8 @@
 package server
 
 import (
+	"fmt"
+	"os"
 	"strings"
 	"sync"
 
@@ -29,8 +31,12 @@ func NewHandler() *protocol.Handler {
 func handleInitialize(ctx *glsp.Context, params *protocol.InitializeParams) (any, error) {
 	if params.RootURI != nil {
 		workspaceRoot = strings.TrimPrefix(string(*params.RootURI), "file://")
+		fmt.Fprintf(os.Stderr, "djot-lsp: RootURI=%s workspaceRoot=%s\n", string(*params.RootURI), workspaceRoot)
 	} else if params.RootPath != nil {
 		workspaceRoot = *params.RootPath
+		fmt.Fprintf(os.Stderr, "djot-lsp: RootPath=%s\n", workspaceRoot)
+	} else {
+		fmt.Fprintf(os.Stderr, "djot-lsp: no root URI or path\n")
 	}
 
 	syncKind := protocol.TextDocumentSyncKindFull
