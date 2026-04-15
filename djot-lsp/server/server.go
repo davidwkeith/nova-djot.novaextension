@@ -44,17 +44,27 @@ func handleInitialize(ctx *glsp.Context, params *protocol.InitializeParams) (any
 }
 
 func handleInitialized(ctx *glsp.Context, params *protocol.InitializedParams) error {
+	port, err := StartPreviewServer()
+	if err != nil {
+		return nil // Non-fatal
+	}
+	ctx.Notify("djot/previewReady", map[string]interface{}{
+		"port": port,
+	})
 	return nil
 }
 
 func handleShutdown(ctx *glsp.Context) error {
+	StopPreviewServer()
 	return nil
 }
 
 func handleDidOpen(ctx *glsp.Context, params *protocol.DidOpenTextDocumentParams) error {
 	doc := NewDocument(params.TextDocument.URI, params.TextDocument.Text)
 	documents.Store(params.TextDocument.URI, doc)
-	return publishDiagnostics(ctx, doc)
+	publishDiagnostics(ctx, doc)
+	BroadcastContent(doc)
+	return nil
 }
 
 func handleDidChange(ctx *glsp.Context, params *protocol.DidChangeTextDocumentParams) error {
@@ -69,7 +79,9 @@ func handleDidChange(ctx *glsp.Context, params *protocol.DidChangeTextDocumentPa
 	}
 	doc := NewDocument(params.TextDocument.URI, whole.Text)
 	documents.Store(params.TextDocument.URI, doc)
-	return publishDiagnostics(ctx, doc)
+	publishDiagnostics(ctx, doc)
+	BroadcastContent(doc)
+	return nil
 }
 
 func handleDidClose(ctx *glsp.Context, params *protocol.DidCloseTextDocumentParams) error {
