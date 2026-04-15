@@ -8,7 +8,7 @@
     "license": "MIT",
     "main": "Scripts/main.js",
     "activationEvents": [
-        "onLanguage:djot"
+        "*"
     ],
     "entitlements": {
         "process": true

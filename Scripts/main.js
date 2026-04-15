@@ -1,7 +1,10 @@
 var langClient = null;
 var previewPort = null;
 
+console.log("djot: main.js loaded");
+
 exports.activate = function() {
+    console.log("djot: activate() called");
     var serverPath = nova.path.join(nova.extension.path, "bin", "djot-lsp");
 
     var serverOptions = {
