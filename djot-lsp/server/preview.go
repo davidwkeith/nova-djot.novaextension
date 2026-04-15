@@ -1,7 +1,6 @@
 package server
 
 import (
-	"crypto/md5"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -43,9 +42,7 @@ func WritePreviewFile(doc *Document) (string, error) {
 	page := previewDocument(body)
 
 	if previewFilePath == "" {
-		hash := md5.Sum([]byte(doc.URI))
-		name := fmt.Sprintf("djot-preview-%x.html", hash[:8])
-		previewFilePath = filepath.Join(os.TempDir(), name)
+		previewFilePath = filepath.Join(os.TempDir(), "djot-preview.html")
 	}
 
 	if err := os.WriteFile(previewFilePath, []byte(page), 0644); err != nil {

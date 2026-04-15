@@ -1,5 +1,5 @@
 var langClient = null;
-var previewFilePath = null;
+var previewPath = nova.path.join(nova.environment.home, "tmp", "djot-preview.html");
 
 exports.activate = function() {
     var serverPath = nova.path.join(nova.extension.path, "bin", "djot-lsp");
@@ -20,18 +20,12 @@ exports.activate = function() {
         clientOptions
     );
 
-    langClient.onNotification("djot/previewFile", function(params) {
-        previewFilePath = params.path;
-    });
-
     langClient.start();
 
     nova.commands.register("io.dwk.djot.preview", function(editor) {
-        if (!previewFilePath) {
-            nova.workspace.showWarningMessage("Preview not ready yet. Try again in a moment.");
-            return;
-        }
-        nova.openURL("file://" + previewFilePath);
+        // The LSP server writes rendered HTML to /tmp/djot-preview.html
+        // on every document change. Open it in the default browser.
+        nova.openURL("file:///tmp/djot-preview.html");
     });
 };
 
@@ -40,5 +34,4 @@ exports.deactivate = function() {
         langClient.stop();
         langClient = null;
     }
-    previewFilePath = null;
 };
