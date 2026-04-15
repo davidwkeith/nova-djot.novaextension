@@ -16,7 +16,16 @@
       "Bash(go test:*)",
       "Skill(commit-commands:commit)",
       "Bash(go run:*)",
-      "Bash(make lsp:*)"
+      "Bash(make lsp:*)",
+      "Bash(echo \"exit: $?\")",
+      "mcp__plugin_github_github__search_code",
+      "mcp__claude_ai_Cloudflare_Developer_Platform__search_cloudflare_documentation",
+      "WebFetch(domain:help.nova.app)",
+      "Bash(./bin/djot-lsp)",
+      "Bash(echo \"exit code: $?\")",
+      "Read(//var/folders/2j/mt8vdc5x3zlggz4s99r_23lw0000gn/T/**)",
+      "Bash(grep:*)",
+      "Bash(curl -s http://localhost:59421/test.dj)"
     ]
   }
 }
