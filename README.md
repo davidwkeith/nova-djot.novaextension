@@ -61,6 +61,14 @@ Hover over a footnote reference to see the footnote's content. Hover over a refe
 
 Cmd-click (or right-click > Jump to Definition) on a footnote reference to jump to its `[^label]:` definition. Works the same for reference links.
 
+## Live Preview
+
+Run **Editor > Preview Djot** (or find it in the command palette) to open a live HTML preview of the current document.
+
+The preview updates in real-time as you type. Scroll sync keeps the preview aligned with your cursor position in the editor — move to a heading in the source and the preview scrolls to match.
+
+The preview runs on a local HTTP server (random port on localhost) and connects via WebSocket for instant updates. No external services or network access required. Supports both light and dark mode.
+
 ## Building from Source
 
 The extension includes pre-compiled binaries, but if you need to rebuild:
@@ -74,6 +82,13 @@ make lsp
 
 # Build both
 make all
+
+## TODO
+
+- [ ] Live preview
+- [ ] JavaScript scripts or commands
+- [ ] Extension settings or configuration
+- [ ] Djot-to-HTML export
 ```
 
 ## Credits
