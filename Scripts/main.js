@@ -113,6 +113,10 @@ exports.activate = function() {
         }
         nova.openURL("http://localhost:" + previewPort + relPath);
     });
+
+    nova.commands.register("io.dwk.djot.toggleEmphasis", function(editor) {
+        wrapSelection(editor, "_", "_");
+    });
 };
 
 exports.deactivate = function() {

@@ -20,12 +20,21 @@
                 "command": "io.dwk.djot.preview",
                 "shortcut": "cmd-shift-p",
                 "when": "editorSyntax == 'djot'"
+            },
+            {
+                "title": "Toggle Emphasis",
+                "command": "io.dwk.djot.toggleEmphasis",
+                "when": "editorSyntax == 'djot'"
             }
         ],
         "extensions": [
             {
                 "title": "Preview Djot",
                 "command": "io.dwk.djot.preview"
+            },
+            {
+                "title": "Toggle Emphasis",
+                "command": "io.dwk.djot.toggleEmphasis"
             }
         ]
     }
