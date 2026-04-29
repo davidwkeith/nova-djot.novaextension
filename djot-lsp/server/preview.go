@@ -156,25 +156,21 @@ func StopPreviewServer() {
 
 func (ps *PreviewServer) handleRequest(w http.ResponseWriter, r *http.Request) {
 	filePath := filepath.Join(ps.rootDir, r.URL.Path)
-	fmt.Fprintf(os.Stderr, "djot-preview: request %s -> %s (root: %s)\n", r.URL.Path, filePath, ps.rootDir)
 
 	if strings.HasSuffix(r.URL.Path, ".dj") {
 		ps.serveDjotPreview(w, filePath)
 		return
 	}
 
-	// Serve other files (CSS, images, etc.) as-is
 	http.ServeFile(w, r, filePath)
 }
 
 func (ps *PreviewServer) serveDjotPreview(w http.ResponseWriter, filePath string) {
 	content, err := os.ReadFile(filePath)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "djot-preview: ReadFile error: %v\n", err)
 		http.Error(w, "File not found", 404)
 		return
 	}
-	fmt.Fprintf(os.Stderr, "djot-preview: read %d bytes from %s\n", len(content), filePath)
 
 	ast := djot_parser.BuildDjotAst(content)
 	var body string
