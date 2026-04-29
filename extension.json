@@ -3,7 +3,7 @@
     "name": "Djot",
     "organization": "dwk",
     "description": "Djot markup language support with syntax highlighting, code folding, symbol navigation, language server, and live preview.",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "categories": ["languages"],
     "license": "MIT",
     "main": "main.js",
