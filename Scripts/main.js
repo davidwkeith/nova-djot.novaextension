@@ -1,6 +1,68 @@
 var langClient = null;
 var previewPort = null;
 
+// ---------------------------------------------------------------------------
+// Editor command helpers
+// ---------------------------------------------------------------------------
+
+// Toggle delimiters around each selected range. Three behaviors:
+//   - Empty range: insert open+close, place cursor between them.
+//   - Selection already wrapped (inner): strip delimiters from selected text.
+//   - Selection's neighbors form delimiters (outer): expand range, strip them.
+//   - Otherwise: wrap the selection.
+// All edits batched into one undo step. Multi-cursor safe via reverse-order
+// processing. Cursor repositioning only applied for the single-empty-range
+// case (other multi-cursor combinations rely on Nova's default behavior).
+function wrapSelection(editor, open, close) {
+    var ranges = editor.selectedRanges.slice().sort(function(a, b) {
+        return b.start - a.start;
+    });
+    var openLen = open.length;
+    var closeLen = close.length;
+    var docLen = editor.document.length;
+
+    var soleEmpty = (ranges.length === 1 && ranges[0].start === ranges[0].end);
+    var soleEmptyStart = soleEmpty ? ranges[0].start : -1;
+
+    editor.edit(function(e) {
+        for (var i = 0; i < ranges.length; i++) {
+            var r = ranges[i];
+
+            if (r.start === r.end) {
+                e.insert(r.start, open + close);
+                continue;
+            }
+
+            var selectedText = editor.document.getTextInRange(r);
+
+            if (selectedText.length >= openLen + closeLen &&
+                selectedText.substring(0, openLen) === open &&
+                selectedText.substring(selectedText.length - closeLen) === close) {
+                var inner = selectedText.substring(openLen, selectedText.length - closeLen);
+                e.replace(r, inner);
+                continue;
+            }
+
+            if (r.start >= openLen && r.end + closeLen <= docLen) {
+                var outerRange = new Range(r.start - openLen, r.end + closeLen);
+                var outerText = editor.document.getTextInRange(outerRange);
+                if (outerText.substring(0, openLen) === open &&
+                    outerText.substring(outerText.length - closeLen) === close) {
+                    e.replace(outerRange, selectedText);
+                    continue;
+                }
+            }
+
+            e.replace(r, open + selectedText + close);
+        }
+    });
+
+    if (soleEmpty) {
+        var pos = soleEmptyStart + openLen;
+        editor.selectedRanges = [new Range(pos, pos)];
+    }
+}
+
 exports.activate = function() {
     var serverPath = nova.path.join(nova.extension.path, "bin", "djot-lsp");
 
