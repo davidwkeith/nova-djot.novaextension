@@ -40,6 +40,11 @@
                 "title": "Toggle Highlight",
                 "command": "io.dwk.djot.toggleHighlight",
                 "when": "editorSyntax == 'djot'"
+            },
+            {
+                "title": "Toggle Blockquote",
+                "command": "io.dwk.djot.toggleBlockquote",
+                "when": "editorSyntax == 'djot'"
             }
         ],
         "extensions": [
@@ -62,6 +67,10 @@
             {
                 "title": "Toggle Highlight",
                 "command": "io.dwk.djot.toggleHighlight"
+            },
+            {
+                "title": "Toggle Blockquote",
+                "command": "io.dwk.djot.toggleBlockquote"
             }
         ]
     }

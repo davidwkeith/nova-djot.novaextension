@@ -63,6 +63,83 @@ function wrapSelection(editor, open, close) {
     }
 }
 
+// Toggle a line prefix on every line touched by any selected range.
+// Detection rule: if every NON-EMPTY affected line already starts with prefix,
+// strip the prefix from those lines (leave blank lines alone). Otherwise,
+// prepend the prefix to every affected line that does not already have it
+// (blank lines included — `> ` on a blank line is valid blockquote
+// continuation).
+function prependLines(editor, prefix) {
+    var doc = editor.document;
+    var docText = doc.getTextInRange(new Range(0, doc.length));
+    var ranges = editor.selectedRanges;
+
+    var lineStartSet = {};
+    for (var i = 0; i < ranges.length; i++) {
+        var r = ranges[i];
+        var firstLineStart = lineStartFor(docText, r.start);
+        var pos = firstLineStart;
+        while (true) {
+            lineStartSet[pos] = true;
+            var nl = docText.indexOf("\n", pos);
+            if (nl === -1 || nl >= r.end) break;
+            pos = nl + 1;
+            // If the selection ends exactly at a line start, do not include
+            // that next line — match the convention of "lines the user is
+            // visibly working on".
+            if (pos > r.end) break;
+        }
+    }
+
+    var lineStarts = Object.keys(lineStartSet)
+        .map(Number)
+        .sort(function(a, b) { return b - a; });
+
+    if (lineStarts.length === 0) return;
+
+    var allHavePrefix = true;
+    var anyNonEmpty = false;
+    for (var j = 0; j < lineStarts.length; j++) {
+        var ls = lineStarts[j];
+        var lineEnd = lineEndFor(docText, ls);
+        var lineText = docText.substring(ls, lineEnd);
+        if (lineText.length === 0) continue;
+        anyNonEmpty = true;
+        if (lineText.substring(0, prefix.length) !== prefix) {
+            allHavePrefix = false;
+        }
+    }
+    var stripping = anyNonEmpty && allHavePrefix;
+
+    editor.edit(function(e) {
+        for (var k = 0; k < lineStarts.length; k++) {
+            var ls2 = lineStarts[k];
+            var lineEnd2 = lineEndFor(docText, ls2);
+            var lineText2 = docText.substring(ls2, lineEnd2);
+
+            if (stripping) {
+                if (lineText2.substring(0, prefix.length) === prefix) {
+                    e.replace(new Range(ls2, ls2 + prefix.length), "");
+                }
+            } else {
+                if (lineText2.substring(0, prefix.length) !== prefix) {
+                    e.insert(ls2, prefix);
+                }
+            }
+        }
+    });
+}
+
+function lineStartFor(docText, pos) {
+    var prevNl = docText.lastIndexOf("\n", pos - 1);
+    return prevNl === -1 ? 0 : prevNl + 1;
+}
+
+function lineEndFor(docText, lineStart) {
+    var nextNl = docText.indexOf("\n", lineStart);
+    return nextNl === -1 ? docText.length : nextNl;
+}
+
 exports.activate = function() {
     var serverPath = nova.path.join(nova.extension.path, "bin", "djot-lsp");
 
@@ -128,6 +205,10 @@ exports.activate = function() {
 
     nova.commands.register("io.dwk.djot.toggleHighlight", function(editor) {
         wrapSelection(editor, "{=", "=}");
+    });
+
+    nova.commands.register("io.dwk.djot.toggleBlockquote", function(editor) {
+        prependLines(editor, "> ");
     });
 };
 
