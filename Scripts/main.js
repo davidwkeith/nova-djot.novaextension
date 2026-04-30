@@ -238,6 +238,25 @@ exports.activate = function() {
         var langEnd = langStart + 8;
         editor.selectedRanges = [new Range(langStart, langEnd)];
     });
+
+    nova.commands.register("io.dwk.djot.insertTable", function(editor) {
+        var firstRange = editor.selectedRanges[0];
+        var selectedText = editor.document.getTextInRange(firstRange);
+        var firstCell = selectedText || "Header 1";
+        var insertText =
+            "| " + firstCell + " | Header 2 |\n" +
+            "|---|---|\n" +
+            "| Cell 1 | Cell 2 |\n" +
+            "| Cell 3 | Cell 4 |\n";
+
+        editor.edit(function(e) {
+            e.replace(firstRange, insertText);
+        });
+
+        var cellStart = firstRange.start + 2;
+        var cellEnd = cellStart + firstCell.length;
+        editor.selectedRanges = [new Range(cellStart, cellEnd)];
+    });
 };
 
 exports.deactivate = function() {

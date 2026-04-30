@@ -55,6 +55,11 @@
                 "title": "Insert Fenced Code Block",
                 "command": "io.dwk.djot.insertCodeBlock",
                 "when": "editorSyntax == 'djot'"
+            },
+            {
+                "title": "Insert Table",
+                "command": "io.dwk.djot.insertTable",
+                "when": "editorSyntax == 'djot'"
             }
         ],
         "extensions": [
@@ -89,6 +94,10 @@
             {
                 "title": "Insert Fenced Code Block",
                 "command": "io.dwk.djot.insertCodeBlock"
+            },
+            {
+                "title": "Insert Table",
+                "command": "io.dwk.djot.insertTable"
             }
         ]
     }
