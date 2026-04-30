@@ -45,6 +45,11 @@
                 "title": "Toggle Blockquote",
                 "command": "io.dwk.djot.toggleBlockquote",
                 "when": "editorSyntax == 'djot'"
+            },
+            {
+                "title": "Insert Link",
+                "command": "io.dwk.djot.insertLink",
+                "when": "editorSyntax == 'djot'"
             }
         ],
         "extensions": [
@@ -71,6 +76,10 @@
             {
                 "title": "Toggle Blockquote",
                 "command": "io.dwk.djot.toggleBlockquote"
+            },
+            {
+                "title": "Insert Link",
+                "command": "io.dwk.djot.insertLink"
             }
         ]
     }

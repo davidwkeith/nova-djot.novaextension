@@ -210,6 +210,20 @@ exports.activate = function() {
     nova.commands.register("io.dwk.djot.toggleBlockquote", function(editor) {
         prependLines(editor, "> ");
     });
+
+    nova.commands.register("io.dwk.djot.insertLink", function(editor) {
+        var firstRange = editor.selectedRanges[0];
+        var selectedText = editor.document.getTextInRange(firstRange);
+        var insertText = "[" + selectedText + "](url)";
+
+        editor.edit(function(e) {
+            e.replace(firstRange, insertText);
+        });
+
+        var urlStart = firstRange.start + 1 + selectedText.length + 2;
+        var urlEnd = urlStart + 3;
+        editor.selectedRanges = [new Range(urlStart, urlEnd)];
+    });
 };
 
 exports.deactivate = function() {
