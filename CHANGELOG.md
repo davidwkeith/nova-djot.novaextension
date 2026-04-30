@@ -1,3 +1,10 @@
+## Version 1.1.0
+
+### Editor Commands
+- Toggle Emphasis, Toggle Strong, Toggle Inline Code, Toggle Highlight — wrap or unwrap inline delimiters
+- Toggle Blockquote — prepend or strip `> ` on selected lines
+- Insert Link, Insert Fenced Code Block, Insert Table — insert templates with the cursor placed on the most-likely-edited slot
+
 ## Version 1.0.0
 
 ### Syntax
