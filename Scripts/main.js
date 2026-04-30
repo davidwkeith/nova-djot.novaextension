@@ -117,6 +117,18 @@ exports.activate = function() {
     nova.commands.register("io.dwk.djot.toggleEmphasis", function(editor) {
         wrapSelection(editor, "_", "_");
     });
+
+    nova.commands.register("io.dwk.djot.toggleStrong", function(editor) {
+        wrapSelection(editor, "*", "*");
+    });
+
+    nova.commands.register("io.dwk.djot.toggleInlineCode", function(editor) {
+        wrapSelection(editor, "`", "`");
+    });
+
+    nova.commands.register("io.dwk.djot.toggleHighlight", function(editor) {
+        wrapSelection(editor, "{=", "=}");
+    });
 };
 
 exports.deactivate = function() {

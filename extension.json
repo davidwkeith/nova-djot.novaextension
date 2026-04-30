@@ -25,6 +25,21 @@
                 "title": "Toggle Emphasis",
                 "command": "io.dwk.djot.toggleEmphasis",
                 "when": "editorSyntax == 'djot'"
+            },
+            {
+                "title": "Toggle Strong",
+                "command": "io.dwk.djot.toggleStrong",
+                "when": "editorSyntax == 'djot'"
+            },
+            {
+                "title": "Toggle Inline Code",
+                "command": "io.dwk.djot.toggleInlineCode",
+                "when": "editorSyntax == 'djot'"
+            },
+            {
+                "title": "Toggle Highlight",
+                "command": "io.dwk.djot.toggleHighlight",
+                "when": "editorSyntax == 'djot'"
             }
         ],
         "extensions": [
@@ -35,6 +50,18 @@
             {
                 "title": "Toggle Emphasis",
                 "command": "io.dwk.djot.toggleEmphasis"
+            },
+            {
+                "title": "Toggle Strong",
+                "command": "io.dwk.djot.toggleStrong"
+            },
+            {
+                "title": "Toggle Inline Code",
+                "command": "io.dwk.djot.toggleInlineCode"
+            },
+            {
+                "title": "Toggle Highlight",
+                "command": "io.dwk.djot.toggleHighlight"
             }
         ]
     }
