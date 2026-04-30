@@ -1,4 +1,4 @@
-# Djot Editor Commands Design Spec
+1# Djot Editor Commands Design Spec
 
 **Date**: 2026-04-29
 **Status**: Approved
@@ -64,8 +64,11 @@ Extensions → Extension Library → Djot → Settings → Keyboard Shortcuts.
 For each range in `editor.selectedRanges`, processed in reverse document order so
 earlier edits do not shift later ranges:
 
-1. **Empty range:** insert `open + close` at the cursor; place the cursor between
-   them by setting `editor.selectedRanges` after the edit.
+1. **Empty range:** scan the current line for an enclosing `open…close` pair around
+   the cursor (i.e., the nearest `open` to the left and the nearest `close` to the
+   right, both on the same line). If found, replace the enclosing span with its
+   inner text. Otherwise, insert `open + close` at the cursor and place the cursor
+   between them by setting `editor.selectedRanges` after the edit resolves.
 2. **Non-empty range — inner wrap detection:** if the selected text starts with `open`
    and ends with `close`, strip them and replace the range with the inner text.
 3. **Non-empty range — outer wrap detection:** if the characters immediately *outside*

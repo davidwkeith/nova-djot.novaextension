@@ -23,12 +23,32 @@ function wrapSelection(editor, open, close) {
 
     var soleEmpty = (ranges.length === 1 && ranges[0].start === ranges[0].end);
     var soleEmptyStart = soleEmpty ? ranges[0].start : -1;
+    var soleEmptyAction = "insert";
 
     editor.edit(function(e) {
         for (var i = 0; i < ranges.length; i++) {
             var r = ranges[i];
 
             if (r.start === r.end) {
+                var docTextScan = editor.document.getTextInRange(new Range(0, docLen));
+                var scanLineStart = lineStartFor(docTextScan, r.start);
+                var scanLineEnd = lineEndFor(docTextScan, scanLineStart);
+                var beforeCursor = docTextScan.substring(scanLineStart, r.start);
+                var afterCursor = docTextScan.substring(r.start, scanLineEnd);
+                var openIdx = beforeCursor.lastIndexOf(open);
+                var closeIdx = afterCursor.indexOf(close);
+
+                if (openIdx !== -1 && closeIdx !== -1) {
+                    var absOpenStart = scanLineStart + openIdx;
+                    var absCloseEnd = r.start + closeIdx + closeLen;
+                    var innerText = docTextScan.substring(absOpenStart + openLen, r.start + closeIdx);
+                    e.replace(new Range(absOpenStart, absCloseEnd), innerText);
+                    if (soleEmpty && i === 0) {
+                        soleEmptyAction = "unwrap";
+                    }
+                    continue;
+                }
+
                 e.insert(r.start, open + close);
                 continue;
             }
@@ -55,12 +75,12 @@ function wrapSelection(editor, open, close) {
 
             e.replace(r, open + selectedText + close);
         }
+    }).then(function() {
+        if (soleEmpty && soleEmptyAction === "insert") {
+            var pos = soleEmptyStart + openLen;
+            editor.selectedRanges = [new Range(pos, pos)];
+        }
     });
-
-    if (soleEmpty) {
-        var pos = soleEmptyStart + openLen;
-        editor.selectedRanges = [new Range(pos, pos)];
-    }
 }
 
 // Toggle a line prefix on every line touched by any selected range.
@@ -87,7 +107,7 @@ function prependLines(editor, prefix) {
             // If the selection ends exactly at a line start, do not include
             // that next line — match the convention of "lines the user is
             // visibly working on".
-            if (pos > r.end) break;
+            if (pos >= r.end) break;
         }
     }
 
@@ -218,11 +238,11 @@ exports.activate = function() {
 
         editor.edit(function(e) {
             e.replace(firstRange, insertText);
+        }).then(function() {
+            var urlStart = firstRange.start + 1 + selectedText.length + 2;
+            var urlEnd = urlStart + 3;
+            editor.selectedRanges = [new Range(urlStart, urlEnd)];
         });
-
-        var urlStart = firstRange.start + 1 + selectedText.length + 2;
-        var urlEnd = urlStart + 3;
-        editor.selectedRanges = [new Range(urlStart, urlEnd)];
     });
 
     nova.commands.register("io.dwk.djot.insertCodeBlock", function(editor) {
@@ -232,11 +252,11 @@ exports.activate = function() {
 
         editor.edit(function(e) {
             e.replace(firstRange, insertText);
+        }).then(function() {
+            var langStart = firstRange.start + 3;
+            var langEnd = langStart + 8;
+            editor.selectedRanges = [new Range(langStart, langEnd)];
         });
-
-        var langStart = firstRange.start + 3;
-        var langEnd = langStart + 8;
-        editor.selectedRanges = [new Range(langStart, langEnd)];
     });
 
     nova.commands.register("io.dwk.djot.insertTable", function(editor) {
@@ -251,11 +271,11 @@ exports.activate = function() {
 
         editor.edit(function(e) {
             e.replace(firstRange, insertText);
+        }).then(function() {
+            var cellStart = firstRange.start + 2;
+            var cellEnd = cellStart + firstCell.length;
+            editor.selectedRanges = [new Range(cellStart, cellEnd)];
         });
-
-        var cellStart = firstRange.start + 2;
-        var cellEnd = cellStart + firstCell.length;
-        editor.selectedRanges = [new Range(cellStart, cellEnd)];
     });
 };
 
