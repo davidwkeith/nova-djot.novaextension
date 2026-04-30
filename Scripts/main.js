@@ -224,6 +224,20 @@ exports.activate = function() {
         var urlEnd = urlStart + 3;
         editor.selectedRanges = [new Range(urlStart, urlEnd)];
     });
+
+    nova.commands.register("io.dwk.djot.insertCodeBlock", function(editor) {
+        var firstRange = editor.selectedRanges[0];
+        var selectedText = editor.document.getTextInRange(firstRange);
+        var insertText = "```language\n" + selectedText + "\n```\n";
+
+        editor.edit(function(e) {
+            e.replace(firstRange, insertText);
+        });
+
+        var langStart = firstRange.start + 3;
+        var langEnd = langStart + 8;
+        editor.selectedRanges = [new Range(langStart, langEnd)];
+    });
 };
 
 exports.deactivate = function() {

@@ -50,6 +50,11 @@
                 "title": "Insert Link",
                 "command": "io.dwk.djot.insertLink",
                 "when": "editorSyntax == 'djot'"
+            },
+            {
+                "title": "Insert Fenced Code Block",
+                "command": "io.dwk.djot.insertCodeBlock",
+                "when": "editorSyntax == 'djot'"
             }
         ],
         "extensions": [
@@ -80,6 +85,10 @@
             {
                 "title": "Insert Link",
                 "command": "io.dwk.djot.insertLink"
+            },
+            {
+                "title": "Insert Fenced Code Block",
+                "command": "io.dwk.djot.insertCodeBlock"
             }
         ]
     }
