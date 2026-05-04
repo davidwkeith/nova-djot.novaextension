@@ -83,6 +83,23 @@ The extension renders Djot files to styled HTML in a `.djot-preview/` directory 
 
 The preview includes styling for headings, code blocks, tables, block quotes, and more. Supports both light and dark mode via `prefers-color-scheme`.
 
+## Editor Commands
+
+Eight editor commands are available under the **Editor** menu (and via Nova's command palette) when a `.dj` file is open. They also appear under **Extensions → Djot**. None claim default keyboard shortcuts — bind your own via Extensions → Extension Library → Djot → Settings → Keyboard Shortcuts.
+
+| Command | Effect |
+|---|---|
+| Toggle Emphasis | Wraps selection with `_…_`, or unwraps if already wrapped |
+| Toggle Strong | Wraps selection with `*…*` |
+| Toggle Inline Code | Wraps selection with `` `…` `` |
+| Toggle Highlight | Wraps selection with `{=…=}` |
+| Toggle Blockquote | Prepends `> ` to selected lines, or strips it if all lines are quoted |
+| Insert Link | Inserts `[text](url)`, leaves the cursor on `url` |
+| Insert Fenced Code Block | Inserts a triple-backtick fence with a `language` placeholder |
+| Insert Table | Inserts a 2-column × 3-row starter table |
+
+All commands batch their edits into a single undo step. Toggle commands also detect when the cursor is *inside* an already-wrapped span (no selection) and unwrap it.
+
 ## Building from Source
 
 The extension includes pre-compiled binaries, but if you need to rebuild:
